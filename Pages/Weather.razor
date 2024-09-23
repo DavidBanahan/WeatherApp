@@ -1,0 +1,77 @@
+﻿@page "/weather"
+@using WeatherData.Models
+@inject WeatherApp.Services.WeatherService WeatherService
+
+<div class="container mt-4">
+    <h3 class="text-light">Weather Forecast</h3>
+
+    <div class="mb-3">
+        <label for="latitude" class="text-light">Enter Latitude:</label>
+        <input @bind="latitude" type="number" step="any" class="form-control" id="latitude" />
+    </div>
+
+    <div class="mb-3">
+        <label for="longitude" class="text-light">Enter Longitude:</label>
+        <input @bind="longitude" type="number" step="any" class="form-control" id="longitude" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="GetWeather">Get Weather</button>
+
+    @if (weather != null && weather.Main != null && weather.Weather != null && weather.Weather.Length > 0 && weather.Wind != null)
+    {
+        <div class="card mt-4" style="background-color: #1f1f1f; color: #e0e0e0;">
+            <div class="card-header">
+                <h5 class="mb-0">Weather in @weather.Name</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">Current Conditions</h6>
+                <p class="card-text">Temperature: @weather.Main.Temp °C</p>
+                <p class="card-text">Humidity: @weather.Main.Humidity %</p>
+                <p class="card-text">Pressure: @weather.Main.Pressure hPa</p>
+                <p class="card-text">Wind Speed: @weather.Wind.Speed m/s</p>
+                <p class="card-text">Description: @(weather.Weather.Length > 0 ? char.ToUpper(weather.Weather[0].Description[0]) + weather.Weather[0].Description[1..] : "No description available")</p>
+            </div>
+        </div>
+    }
+    else if (isLoading)
+    {
+        <p class="loading text-light">Loading...</p>
+    }
+    else if (errorMessage != null)
+    {
+        <p class="text-danger">@errorMessage</p>
+    }
+    else
+    {
+        <p class="text-light">Please enter valid latitude and longitude to get the weather forecast.</p>
+    }
+</div>
+
+@code {
+    private double latitude;
+    private double longitude;
+    private WeatherResponse? weather;
+    private bool isLoading = false;
+    private string? errorMessage;
+
+    private async Task GetWeather()
+    {
+        if (latitude != 0 && longitude != 0)
+        {
+            isLoading = true;
+            errorMessage = null;
+
+            weather = await WeatherService.GetWeather(latitude, longitude);
+            if (weather == null)
+            {
+                errorMessage = "Unable to retrieve weather data. Please check your input.";
+            }
+
+            isLoading = false;
+        }
+        else
+        {
+            errorMessage = "Please enter a valid latitude and longitude.";
+        }
+    }
+}
