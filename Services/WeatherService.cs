@@ -6,7 +6,7 @@ namespace WeatherApp.Services
     public class WeatherService
     {
         private readonly HttpClient _httpClient; // HttpClient for making API requests
-        private const string API_KEY = "c01a14a0abebffac418113ef879a33bf";
+        private const string API_KEY = "5f30c54ed49f153560654774ad7baef5";
 
         // Constructor that initialises the HttpClient
         public WeatherService(HttpClient httpClient)
